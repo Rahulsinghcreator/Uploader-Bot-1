@@ -1,0 +1,30 @@
+
+{
+    "name": "NtrRazYt",
+    "description": "『ᎷΔŞŦᏋᏒ』",
+    "repository": "https://github.com/NtrRaz",
+    "keywords": [
+        "telegram bot",
+        "pyrogram"
+    ],
+    "env": {
+        "BOT_TOKEN": {
+            "description": "Your Bot token from @Botfather #NtrRazYt",
+            "value": "",
+            "required": true
+        }
+    },
+    "addons": [],
+    "buildpacks": [
+        {
+            "url": "https://github.com/amivin/aria2-heroku.git"
+        },
+        {
+            "url": "heroku/python"
+        },       
+        {
+            "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+        }
+    ]
+
+}
