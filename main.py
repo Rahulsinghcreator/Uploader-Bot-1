@@ -35,7 +35,7 @@ def upload(update, context):
 # Define the main function to start the bot
 def main():
     # Initialize the bot
-    updater = Updater("YOUR_TELEGRAM_BOT_TOKEN", use_context=True)
+    updater = Updater("6874298081:AAFolEJq4zqyJORJuENjXpOsWCi5R91oTZA", use_context=True)
     dispatcher = updater.dispatcher
 
     # Register command handlers
