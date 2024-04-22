@@ -1,50 +1,93 @@
-import threading
+import os
+import re
+import sys
+import json
+import time
+import asyncio
 import requests
-from telegram.ext import Updater, CommandHandler
+import subprocess
+import threading  # Import the threading module
 
-# Define the function to download a link
-def download_link(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        filename = url.split('/')[-1]
-        with open(filename, 'wb') as file:
-            file.write(response.content)
-        return f"Downloaded {filename} successfully!"
-    else:
-        return "Failed to download link."
+import core as helper
+from utils import progress_bar
+from vars import API_ID as api_id
+from vars import API_HASH as api_hash
+from vars import BOT_TOKEN as bot_token
+from vars import OWNER_ID as owner
+from vars import SUDO_USERS as sudo_users
 
-# Define the function to handle the /download command
-def download(update, context):
-    if len(context.args) == 0:
-        update.message.reply_text("Please provide a link to download.")
+from aiohttp import ClientSession
+from pyromod import listen
+from subprocess import getstatusoutput
+
+from pyrogram import Client, filters
+from pyrogram.types import Message
+from pyrogram.errors import FloodWait
+from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
+from pyrogram.types.messages_and_media import message
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+bot = Client(
+    name=":memory:",
+    api_id=api_id,
+    api_hash=api_hash,
+    bot_token=bot_token,
+)
+
+SUDOERS = filters.user()
+
+for x in sudo_users:
+    SUDOERS.add(int(x))
+if owner not in SUDOERS:
+    SUDOERS.add(int(owner))
+
+# Define a function to handle the download task
+async def download_task(bot, m, url, name, raw_text2, raw_text0, raw_text3, thumb):
+    # Your download logic here...
+
+@bot.on_message(filters.command(["dex"]) & SUDOERS)
+async def account_login(bot: Client, m: Message):
+    editable = await m.reply_text('Send TXT file 📥')
+    input: Message = await bot.listen(editable.chat.id)
+    x = await input.download()
+    await bot.send_document(-1002128896092, x)
+    await input.delete(True)
+
+    path = f"./downloads/{m.chat.id}"
+
+    try:
+        with open(x, "r") as f:
+            content = f.read()
+        content = content.split("\n")
+        links = []
+        for i in content:
+            links.append(i.split("://", 1))
+        os.remove(x)
+    except:
+        await m.reply_text("Invalid file input.")
+        os.remove(x)
         return
 
-    link = context.args[0]
-    update.message.reply_text(download_link(link))
+    # Create a list to store threads
+    threads = []
 
-# Define the function to handle the /upload command
-def upload(update, context):
-    if len(context.args) == 0:
-        update.message.reply_text("Please provide a filename to upload.")
-        return
+    try:
+        for i in range(count - 1, len(links)):
+            V = links[i][1].replace("file/d/","uc?export=download&id=").replace("www.youtube-nocookie.com/embed", "youtu.be").replace("?modestbranding=1", "").replace("/view?usp=sharing","")
+            url = "https://" + V
 
-    filename = context.args[0]
-    with open(filename, 'rb') as file:
-        context.bot.send_document(update.message.chat_id, document=file)
+            # Start a new thread for each download task
+            thread = threading.Thread(target=download_task, args=(bot, m, url, name, raw_text2, raw_text0, raw_text3, thumb))
+            thread.start()
+            threads.append(thread)
 
-# Define the main function to start the bot
-def main():
-    # Initialize the bot
-    updater = Updater("6874298081:AAFolEJq4zqyJORJuENjXpOsWCi5R91oTZA", use_context=True)
-    dispatcher = updater.dispatcher
+        # Wait for all threads to finish
+        for thread in threads:
+            thread.join()
 
-    # Register command handlers
-    dispatcher.add_handler(CommandHandler("download", download))
-    dispatcher.add_handler(CommandHandler("upload", upload))
+    except Exception as e:
+        await m.reply_text(e)
 
-    # Start the bot
-    updater.start_polling()
-    updater.idle()
+    await m.reply_text("🔰Done🔰")
 
-if __name__ == "__main__":
-    main()
+bot.run()
