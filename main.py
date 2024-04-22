@@ -9,12 +9,12 @@ import subprocess
 import threading  # Import the threading module
 
 import core as helper
-from utils import progress_bar
-from vars import API_ID as api_id
-from vars import API_HASH as api_hash
+#from utils import progress_bar
+#from vars import API_ID as api_id
+#from vars import API_HASH as api_hash
 from vars import BOT_TOKEN as bot_token
-from vars import OWNER_ID as owner
-from vars import SUDO_USERS as sudo_users
+#from vars import OWNER_ID as owner
+#from vars import SUDO_USERS as sudo_users
 
 from aiohttp import ClientSession
 from pyromod import listen
@@ -36,10 +36,10 @@ bot = Client(
 
 SUDOERS = filters.user()
 
-for x in sudo_users:
-    SUDOERS.add(int(x))
-if owner not in SUDOERS:
-    SUDOERS.add(int(owner))
+#for x in sudo_users:
+#    SUDOERS.add(int(x))
+#if owner not in SUDOERS:
+#    SUDOERS.add(int(owner))
 
 # Define a function to handle the download task
 async def download_task(bot, m, url, name, raw_text2, raw_text0, raw_text3, thumb):
